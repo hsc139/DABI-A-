@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Haluk Local AI</title>
+    <style>
+        body { background: #0f0f0f; color: #e0e0e0; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        #chat-container { flex: 1; overflow-y: auto; border: 1px solid #333; border-radius: 10px; padding: 20px; background: #1a1a1a; display: flex; flex-direction: column; gap: 15px; }
+        .message { max-width: 80%; padding: 12px 16px; border-radius: 15px; line-height: 1.5; margin-bottom: 10px; }
+        .user-msg { align-self: flex-end; background-color: #007bff; color: white; }
+        .ai-msg { align-self: flex-start; background-color: #333; color: #e0e0e0; }
+        #input-area { display: flex; gap: 10px; margin-top: 20px; }
+        input { flex: 1; background: #252525; border: 1px solid #444; color: white; padding: 15px; border-radius: 8px; outline: none; }
+        button { padding: 0 25px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">HALUK LOCAL AI 🍎</h2>
+    <div id="chat-container">
+        <div class="message ai-msg">Sistem hazır Haluk Bey.</div>
+    </div>
+    <div id="input-area">
+        <input type="text" id="userInput" placeholder="Mesajınızı yazın..." autocomplete="off">
+        <button id="sendBtn" onclick="sendMessage()">GÖNDER</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const chat = document.getElementById('chat-container');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // 1. Kullanıcı mesajını ekle
+            chat.innerHTML += `<div class="message user-msg">${text}</div>`;
+            input.value = '';
+            chat.scrollTop = chat.scrollHeight;
+
+            // 2. Yükleniyor mesajı
+            const loadingId = "L-" + Date.now();
+            chat.innerHTML += `<div class="message ai-msg" id="${loadingId}">Düşünüyorum...</div>`;
+
+            try {
+                // Flask sunucusuna isteği at
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: text })
+                });
+                const data = await response.json();
+                document.getElementById(loadingId).innerText = data.response;
+            } catch (error) {
+                document.getElementById(loadingId).innerText = "Hata: Sunucuya ulaşılamadı. Python çalışıyor mu?";
+            }
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // Enter tuşu desteği
+        document.getElementById('userInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
