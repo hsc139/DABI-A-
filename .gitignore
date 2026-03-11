@@ -1,0 +1,4 @@
+.env
+jarvis_env/
+__pycache__/
+*.json

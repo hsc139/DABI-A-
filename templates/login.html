@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DABI | Login</title>
+    <style>
+        body {
+            background: #020205;
+            color: #00d2ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 40px;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+        }
+        h1 { letter-spacing: 5px; margin-bottom: 30px; }
+        input {
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            outline: none;
+            width: 280px;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #00d2ff; }
+        button {
+            background: #00d2ff;
+            color: black;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        button:hover { opacity: 0.8; }
+        .links { margin-top: 20px; font-size: 13px; color: #888; }
+        a { color: #00d2ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h1>DABI CORE</h1>
+        <form action="/login" method="post">
+            <input type="text" name="username" placeholder="OPERATOR NAME" required><br>
+            <input type="password" name="password" placeholder="ACCESS KEY" required><br>
+            <button type="submit">Execute Login</button>
+        </form>
+        <div class="links">
+            Sistemde kayıtlı değil misiniz? <a href="/register">Yeni Profil Oluştur</a>
+        </div>
+    </div>
+</body>
+</html>

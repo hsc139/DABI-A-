@@ -2,61 +2,428 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Haluk Local AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DABI | Neural Interface v4.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0f0f0f; color: #e0e0e0; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        #chat-container { flex: 1; overflow-y: auto; border: 1px solid #333; border-radius: 10px; padding: 20px; background: #1a1a1a; display: flex; flex-direction: column; gap: 15px; }
-        .message { max-width: 80%; padding: 12px 16px; border-radius: 15px; line-height: 1.5; margin-bottom: 10px; }
-        .user-msg { align-self: flex-end; background-color: #007bff; color: white; }
-        .ai-msg { align-self: flex-start; background-color: #333; color: #e0e0e0; }
-        #input-area { display: flex; gap: 10px; margin-top: 20px; }
-        input { flex: 1; background: #252525; border: 1px solid #444; color: white; padding: 15px; border-radius: 8px; outline: none; }
-        button { padding: 0 25px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        :root {
+            --neon-cyan: #00f2ff;
+            --neon-blue: #0062ff;
+            --neon-purple: #bc00ff;
+            --bg-deep: #020205;
+            --glass-bg: rgba(10, 10, 15, 0.85);
+            --border-glow: rgba(0, 242, 255, 0.3);
+        }
+
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+
+        body {
+            background: var(--bg-deep);
+            color: #e0e0e0;
+            font-family: 'Fira Code', monospace;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 98, 255, 0.05) 0%, transparent 80%),
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 100%, 100% 4px, 4px 100%;
+        }
+
+        /* Sol Panel - Sistem Durumu */
+        aside {
+            width: 320px;
+            background: var(--glass-bg);
+            border-right: 1px solid var(--border-glow);
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            z-index: 10;
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-area h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.5));
+            letter-spacing: 8px;
+        }
+
+        .sys-monitor {
+            flex: 1;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid #222;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .stat-label { color: var(--neon-cyan); font-weight: bold; margin-bottom: 8px; display: block; }
+        .progress-bg { width: 100%; height: 6px; background: #111; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); transition: 0.5s; }
+
+        /* Ana Gövde */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        header {
+            height: 70px;
+            border-bottom: 1px solid var(--border-glow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .dot { height: 8px; width: 8px; background: var(--neon-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--neon-cyan); animation: pulse 1.5s infinite; }
+
+        /* Sohbet Alanı */
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            scroll-behavior: smooth;
+        }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+        }
+
+        .user-wrapper { align-self: flex-end; }
+        .ai-wrapper { align-self: flex-start; }
+
+        .message {
+            padding: 18px 25px;
+            font-size: 15px;
+            line-height: 1.6;
+            position: relative;
+            border-radius: 2px;
+            white-space: pre-wrap;
+        }
+
+        .user-msg {
+            background: rgba(0, 242, 255, 0.03);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: inset 0 0 15px rgba(0, 242, 255, 0.05);
+        }
+
+        .ai-msg {
+            background: rgba(188, 0, 255, 0.03);
+            border: 1px solid var(--neon-purple);
+            color: #fff;
+            box-shadow: inset 0 0 15px rgba(188, 0, 255, 0.05);
+        }
+
+        .meta {
+            font-size: 10px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #555;
+        }
+
+        /* Giriş Paneli */
+        .input-area {
+            padding: 30px;
+            background: linear-gradient(to top, var(--bg-deep), transparent);
+        }
+
+        .input-wrapper {
+            background: var(--glass-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            font-size: 16px;
+            padding: 10px;
+            outline: none;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: #666;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            border-radius: 3px;
+        }
+
+        .action-btn:hover {
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
+        }
+
+        #sendBtn {
+            background: var(--neon-cyan);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+        }
+
+        /* Animasyonlar */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        /* Reset Butonu Özel */
+        .danger-btn {
+            border: 1px solid #ff004c;
+            color: #ff004c;
+            background: transparent;
+            padding: 8px 15px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        .danger-btn:hover { background: #ff004c; color: #fff; box-shadow: 0 0 15px #ff004c; }
+
     </style>
 </head>
 <body>
-    <h2 style="text-align: center;">HALUK LOCAL AI 🍎</h2>
-    <div id="chat-container">
-        <div class="message ai-msg">Sistem hazır Haluk Bey.</div>
-    </div>
-    <div id="input-area">
-        <input type="text" id="userInput" placeholder="Mesajınızı yazın..." autocomplete="off">
-        <button id="sendBtn" onclick="sendMessage()">GÖNDER</button>
-    </div>
+
+    <aside>
+        <div class="logo-area">
+            <h1>DABI</h1>
+            <div style="font-size: 10px; letter-spacing: 2px; color: #555;">NEURAL INTERFACE V4.0</div>
+        </div>
+
+        <div class="sys-monitor">
+            <div class="stat-card">
+                <span class="stat-label">CPU USAGE</span>
+                <div class="progress-bg"><div class="progress-fill" id="cpu-bar" style="width: 45%;"></div></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span id="cpu-val">45%</span><span>CORE: 12</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-label">NEURAL MEMORY</span>
+                <div class="progress-bg"><div class="progress-fill" style="width: 72%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple);"></div></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                    <span>72%</span><span>SYNCED</span>
+                </div>
+            </div>
+
+            <div class="stat-card" style="margin-top: 40px;">
+                <span class="stat-label">OPERATOR INFO</span>
+                <div style="color: #fff; font-size: 14px; border-left: 2px solid var(--neon-cyan); padding-left: 10px;">
+                    ID: {{ username.upper() }}<br>
+                    RANK: {% if is_admin %}LEVEL 10 (ROOT){% else %}AUTHORIZED USER{% endif %}<br>
+                    STATUS: ACTIVE
+                </div>
+            </div>
+
+            <div style="margin-top: auto; padding-bottom: 20px;">
+                <button class="danger-btn" onclick="resetSystem()"><i class="fas fa-radiation"></i> WIPE MEMORY</button>
+            </div>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div class="status-badge">
+                <div class="dot"></div>
+                <span>SİSTEM ÇEVRİMİÇİ // ŞİFRELİ BAĞLANTI</span>
+            </div>
+            <div style="font-family: 'Orbitron'; letter-spacing: 2px;">
+                {% if is_admin %}
+                <a href="/admin/chats" style="color: var(--neon-cyan); text-decoration: none; font-size: 12px; border: 1px solid var(--neon-cyan); padding: 5px 10px;">MONITORING PANEL</a>
+                {% endif %}
+                <a href="/logout" style="color: #666; text-decoration: none; font-size: 12px; margin-left: 20px;">LOGOUT</a>
+            </div>
+        </header>
+
+        <div id="chat-container">
+            </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <button class="action-btn" title="Dosya Ekle"><i class="fas fa-paperclip"></i></button>
+                <input type="text" id="userInput" placeholder="Neural komut iletin..." autocomplete="off" autofocus>
+                <button id="sendBtn" onclick="sendMessage()">EXECUTE</button>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <span style="font-size: 10px; color: #444;">QUICK_CMD:</span>
+                <button class="action-btn" style="font-size: 9px; padding: 4px 8px;" onclick="quickCmd('Kod yazımı için hazırlan')">CODE_MOD</button>
+                <button class="action-btn" style="font-size: 9px; padding: 4px 8px;" onclick="quickCmd('Özet çıkar')">SUMMARY</button>
+                <button class="action-btn" style="font-size: 9px; padding: 4px 8px;" onclick="quickCmd('Güvenlik analizi yap')">SEC_CHECK</button>
+            </div>
+        </div>
+    </main>
 
     <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('userInput');
+
+        // Sayfa yüklendiğinde geçmişi çek
+        window.onload = async () => {
+            const res = await fetch('/get_history');
+            const history = await res.json();
+            history.forEach(item => {
+                appendMessage('user', item.user);
+                appendMessage('ai', item.ai);
+            });
+            scrollChat();
+            startRandomStats();
+        };
+
         async function sendMessage() {
-            const input = document.getElementById('userInput');
-            const chat = document.getElementById('chat-container');
-            const text = input.value.trim();
+            const text = userInput.value.trim();
             if (!text) return;
 
-            // 1. Kullanıcı mesajını ekle
-            chat.innerHTML += `<div class="message user-msg">${text}</div>`;
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
+            appendMessage('user', text);
+            userInput.value = '';
+            scrollChat();
 
-            // 2. Yükleniyor mesajı
-            const loadingId = "L-" + Date.now();
-            chat.innerHTML += `<div class="message ai-msg" id="${loadingId}">Düşünüyorum...</div>`;
+            // Loading göster
+            const loadingId = 'load-' + Date.now();
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message-wrapper ai-wrapper';
+            loadingDiv.innerHTML = `
+                <div class="meta">DABI SYSTEM</div>
+                <div class="message ai-msg loading-dots" id="${loadingId}">VERİ İŞLENİYOR</div>
+            `;
+            chatContainer.appendChild(loadingDiv);
+            scrollChat();
 
             try {
-                // Flask sunucusuna isteği at
                 const response = await fetch('/ask', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: text })
                 });
                 const data = await response.json();
-                document.getElementById(loadingId).innerText = data.response;
-            } catch (error) {
-                document.getElementById(loadingId).innerText = "Hata: Sunucuya ulaşılamadı. Python çalışıyor mu?";
+                
+                // Loading'i kaldır ve gerçek cevabı daktilo ile yaz
+                document.getElementById(loadingId).classList.remove('loading-dots');
+                typeWriter(loadingId, data.response);
+            } catch (err) {
+                document.getElementById(loadingId).innerText = "ERROR: NEURAL LINK ERROR.";
             }
-            chat.scrollTop = chat.scrollHeight;
         }
 
-        // Enter tuşu desteği
-        document.getElementById('userInput').addEventListener('keypress', function (e) {
+        function appendMessage(sender, text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${sender}-wrapper`;
+            const meta = sender === 'user' ? 'OPERATOR' : 'DABI CORE';
+            wrapper.innerHTML = `
+                <div class="meta">${meta}</div>
+                <div class="message ${sender}-msg">${text}</div>
+            `;
+            chatContainer.appendChild(wrapper);
+            scrollChat();
+        }
+
+        function typeWriter(id, text) {
+            const el = document.getElementById(id);
+            el.innerText = "";
+            let i = 0;
+            function write() {
+                if (i < text.length) {
+                    el.innerText += text.charAt(i);
+                    i++;
+                    setTimeout(write, 15);
+                    scrollChat();
+                }
+            }
+            write();
+        }
+
+        function scrollChat() {
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function resetSystem() {
+            if(confirm("UYARI: Tüm neural hafıza kalıcı olarak silinecek! Devam edilsin mi?")) {
+                await fetch('/reset', { method: 'POST' });
+                chatContainer.innerHTML = '<div style="color:red; text-align:center;">--- BELLEK SIFIRLANDI ---</div>';
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
+
+        function quickCmd(cmd) {
+            userInput.value = cmd;
+            sendMessage();
+        }
+
+        // Simüle edilmiş CPU hareketleri
+        function startRandomStats() {
+            setInterval(() => {
+                const cpu = Math.floor(Math.random() * (60 - 30) + 30);
+                document.getElementById('cpu-bar').style.width = cpu + '%';
+                document.getElementById('cpu-val').innerText = cpu + '%';
+            }, 3000);
+        }
+
+        userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
     </script>

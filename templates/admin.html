@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>DABI | Admin</title>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; height: 100vh; margin: 0; }
+        .list { width: 250px; background: #0a0a0a; border-right: 1px solid #222; overflow-y: auto; }
+        .u-card { padding: 15px; border-bottom: 1px solid #111; cursor: pointer; }
+        .u-card:hover { background: #111; }
+        .main { flex: 1; padding: 20px; overflow-y: auto; }
+        .chat-view { display: none; }
+        .chat-view.active { display: block; }
+        .box { padding: 10px; margin-bottom: 10px; border-radius: 5px; background: #111; }
+    </style>
+</head>
+<body>
+    <div class="list">
+        <h3 style="padding:15px; color:#00d2ff;">USER MONITOR</h3>
+        {% for u, h in all_chats.items() %}
+        <div class="u-card" onclick="show('{{u}}')">{{ u }} ({{ h|length }})</div>
+        {% endfor %}
+    </div>
+    <div class="main">
+        {% for u, h in all_chats.items() %}
+        <div id="u-{{u}}" class="chat-view">
+            <h2>User: {{ u }}</h2>
+            {% for m in h %}
+            <div class="box"><b>User:</b> {{ m.user }}</div>
+            <div class="box" style="color:#00d2ff;"><b>DABI:</b> {{ m.ai }}</div>
+            <hr style="border-color:#222;">
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        function show(u) {
+            document.querySelectorAll('.chat-view').forEach(e => e.classList.remove('active'));
+            document.getElementById('u-' + u).classList.add('active');
+        }
+    </script>
+</body>
+</html>
