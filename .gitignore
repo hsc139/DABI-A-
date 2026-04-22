@@ -1,4 +1,6 @@
 .env
-jarvis_env/
+venv/
 __pycache__/
-*.json
+*.db
+.DS_Store
+.replit

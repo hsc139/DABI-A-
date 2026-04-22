@@ -1,70 +1,94 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DABI | Login</title>
-    <style>
-        body {
-            background: #020205;
-            color: #00d2ff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-        }
-        .login-card {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 40px;
-            border: 1px solid rgba(0, 210, 255, 0.3);
-            border-radius: 15px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
-        }
-        h1 { letter-spacing: 5px; margin-bottom: 30px; }
-        input {
-            background: #000;
-            border: 1px solid #333;
-            color: white;
-            padding: 12px;
-            border-radius: 5px;
-            outline: none;
-            width: 280px;
-            margin-bottom: 15px;
-            transition: 0.3s;
-        }
-        input:focus { border-color: #00d2ff; }
-        button {
-            background: #00d2ff;
-            color: black;
-            border: none;
-            padding: 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        button:hover { opacity: 0.8; }
-        .links { margin-top: 20px; font-size: 13px; color: #888; }
-        a { color: #00d2ff; text-decoration: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DABI CORE — ACCESS</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --neon-blue: #00f2ff; --neon-pink: #ff00c1; --bg: #050510; }
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fira Code', monospace;
+  overflow: hidden; position: relative;
+}
+.grid-bg {
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(0,242,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,242,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px; z-index: 0;
+}
+.scanline {
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px);
+  z-index: 1; pointer-events: none;
+}
+.card {
+  position: relative; z-index: 2;
+  background: rgba(0,242,255,0.03);
+  border: 1px solid rgba(0,242,255,0.2);
+  border-radius: 4px; padding: 50px 40px; width: 440px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 60px rgba(0,242,255,0.08), inset 0 0 60px rgba(0,0,0,0.5);
+}
+.corner { position: absolute; width: 14px; height: 14px; border-color: var(--neon-blue); border-style: solid; }
+.corner.tl { top: 8px; left: 8px; border-width: 1px 0 0 1px; }
+.corner.tr { top: 8px; right: 8px; border-width: 1px 1px 0 0; }
+.corner.bl { bottom: 8px; left: 8px; border-width: 0 0 1px 1px; }
+.corner.br { bottom: 8px; right: 8px; border-width: 0 1px 1px 0; }
+.logo {
+  font-family: 'Orbitron', sans-serif; font-size: 2.4rem; font-weight: 900;
+  color: var(--neon-blue); text-align: center; letter-spacing: 10px;
+  text-shadow: 0 0 20px var(--neon-blue), 0 0 60px rgba(0,242,255,0.3);
+  margin-bottom: 6px;
+}
+.sub { text-align: center; color: rgba(0,242,255,0.35); font-size: 0.6rem; letter-spacing: 3px; margin-bottom: 40px; }
+label { display: block; color: rgba(0,242,255,0.5); font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 6px; margin-top: 22px; }
+input {
+  width: 100%; background: rgba(0,242,255,0.04); border: 1px solid rgba(0,242,255,0.15);
+  border-radius: 2px; padding: 13px 16px; color: var(--neon-blue);
+  font-family: 'Fira Code', monospace; font-size: 0.9rem; outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+input:focus { border-color: var(--neon-blue); box-shadow: 0 0 14px rgba(0,242,255,0.25); }
+input::placeholder { color: rgba(0,242,255,0.2); }
+.btn {
+  width: 100%; margin-top: 30px; padding: 14px; background: transparent;
+  border: 1px solid var(--neon-blue); border-radius: 2px;
+  color: var(--neon-blue); font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 4px;
+  cursor: pointer; transition: all 0.3s; text-transform: uppercase;
+}
+.btn:hover { background: var(--neon-blue); color: var(--bg); box-shadow: 0 0 24px rgba(0,242,255,0.5); }
+.link-row { text-align: center; margin-top: 22px; color: rgba(0,242,255,0.3); font-size: 0.72rem; }
+.link-row a { color: var(--neon-pink); text-decoration: none; transition: text-shadow 0.3s; }
+.link-row a:hover { text-shadow: 0 0 10px var(--neon-pink); }
+.error {
+  margin-top: 18px; padding: 10px 14px;
+  background: rgba(255,0,193,0.07); border: 1px solid rgba(255,0,193,0.4);
+  border-radius: 2px; color: var(--neon-pink); font-size: 0.73rem; letter-spacing: 1px;
+}
+</style>
 </head>
 <body>
-    <div class="login-card">
-        <h1>DABI CORE</h1>
-        <form action="/login" method="post">
-            <input type="text" name="username" placeholder="OPERATOR NAME" required><br>
-            <input type="password" name="password" placeholder="ACCESS KEY" required><br>
-            <button type="submit">Execute Login</button>
-        </form>
-        <div class="links">
-            Sistemde kayıtlı değil misiniz? <a href="/register">Yeni Profil Oluştur</a>
-        </div>
-    </div>
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+<div class="card">
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+  <div class="logo">DABI</div>
+  <div class="sub">DIGITAL ASSISTANT &amp; BEHAVIORAL INTELLIGENCE</div>
+  <form method="POST">
+    <label>OPERATOR NAME</label>
+    <input type="text" name="username" placeholder="Kimlik girin..." autocomplete="username" required>
+    <label>ACCESS KEY</label>
+    <input type="password" name="password" placeholder="Şifre girin..." autocomplete="current-password" required>
+    <button class="btn" type="submit">EXECUTE LOGIN</button>
+  </form>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <div class="link-row">Sistemde kayıtlı değil misiniz? <a href="/register">Yeni Profil Oluştur</a></div>
+</div>
 </body>
 </html>

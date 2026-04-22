@@ -2,42 +2,443 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>DABI | Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DABI CORE | System Administration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; height: 100vh; margin: 0; }
-        .list { width: 250px; background: #0a0a0a; border-right: 1px solid #222; overflow-y: auto; }
-        .u-card { padding: 15px; border-bottom: 1px solid #111; cursor: pointer; }
-        .u-card:hover { background: #111; }
-        .main { flex: 1; padding: 20px; overflow-y: auto; }
-        .chat-view { display: none; }
-        .chat-view.active { display: block; }
-        .box { padding: 10px; margin-bottom: 10px; border-radius: 5px; background: #111; }
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-pink: #ff00c1;
+            --neon-purple: #bc00ff;
+            --dark-bg: #05050a;
+            --card-bg: rgba(15, 15, 25, 0.9);
+            --border-color: rgba(0, 242, 255, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--neon-blue); }
+
+        body {
+            background: var(--dark-bg);
+            background-image: radial-gradient(circle at 50% 50%, rgba(20,20,35,1) 0%, rgba(5,5,10,1) 100%);
+            color: #fff;
+            font-family: 'Fira Code', monospace;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            background: rgba(10,10,20,0.97);
+            border-right: 1px solid var(--border-color);
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0,242,255,0.1);
+        }
+
+        .logo-area h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            letter-spacing: 4px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .logo-area .sub { font-size: 9px; color: var(--neon-pink); margin-top: 5px; letter-spacing: 2px; }
+
+        .user-list { flex: 1; overflow-y: auto; padding-right: 4px; }
+
+        .user-item {
+            padding: 13px 14px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(0,242,255,0.08);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .user-item:hover {
+            background: rgba(0,242,255,0.05);
+            border-color: rgba(0,242,255,0.3);
+            transform: translateX(4px);
+        }
+
+        .user-item.active {
+            background: rgba(0,242,255,0.08);
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 12px rgba(0,242,255,0.15);
+        }
+
+        .user-item-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .user-icon { color: var(--neon-blue); font-size: 13px; }
+        .user-name-txt { font-size: 13px; color: #eee; flex: 1; }
+        .user-badges { display: flex; gap: 5px; }
+        .badge {
+            font-size: 8px; padding: 2px 6px; border-radius: 2px;
+            font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+        }
+        .badge-admin { background: rgba(0,242,255,0.15); color: var(--neon-blue); border: 1px solid rgba(0,242,255,0.3); }
+        .badge-banned { background: rgba(255,0,60,0.15); color: #ff003c; border: 1px solid rgba(255,0,60,0.3); }
+        .badge-ok { background: rgba(0,255,120,0.1); color: #00ff88; border: 1px solid rgba(0,255,120,0.25); }
+        .user-ip-txt { font-size: 9px; color: rgba(255,255,255,0.25); margin-bottom: 8px; padding-left: 25px; }
+
+        .action-row { display: flex; gap: 5px; flex-wrap: wrap; padding-left: 25px; }
+        .act-btn {
+            padding: 3px 9px; background: transparent; border-radius: 2px;
+            font-family: 'Orbitron', sans-serif; font-size: 8px; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.2s; border: 1px solid;
+        }
+        .act-msg { border-color: rgba(0,242,255,0.4); color: var(--neon-blue); }
+        .act-msg:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 8px rgba(0,242,255,0.4); }
+        .act-ban { border-color: rgba(255,0,60,0.5); color: #ff003c; }
+        .act-ban:hover { background: #ff003c; color: #fff; box-shadow: 0 0 8px rgba(255,0,60,0.4); }
+        .act-unban { border-color: rgba(0,255,120,0.5); color: #00ff88; }
+        .act-unban:hover { background: #00ff88; color: #000; box-shadow: 0 0 8px rgba(0,255,120,0.4); }
+        .act-del { border-color: rgba(255,0,193,0.5); color: var(--neon-pink); }
+        .act-del:hover { background: var(--neon-pink); color: #000; box-shadow: 0 0 8px rgba(255,0,193,0.4); }
+
+        .system-footer {
+            padding-top: 18px;
+            border-top: 1px solid rgba(0,242,255,0.08);
+            font-size: 10px;
+            color: #555;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .system-footer #clock { color: var(--neon-blue); font-size: 10px; }
+
+        /* MAIN */
+        .main-content {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow: hidden;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 22px 24px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+        }
+
+        .stat-label { font-size: 10px; color: #666; margin-bottom: 10px; letter-spacing: 2px; text-transform: uppercase; }
+        .stat-value { font-size: 26px; font-family: 'Orbitron', sans-serif; }
+        .stat-blue { color: var(--neon-blue); text-shadow: 0 0 10px rgba(0,242,255,0.4); }
+        .stat-green { color: #00ff88; text-shadow: 0 0 10px rgba(0,255,120,0.4); }
+        .stat-pink { color: var(--neon-pink); text-shadow: 0 0 10px rgba(255,0,193,0.4); }
+
+        .chat-viewer {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            background: rgba(0,242,255,0.04);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        #target-label { color: var(--neon-blue); letter-spacing: 2px; }
+        #msg-badge { color: rgba(255,0,193,0.7); font-size: 11px; }
+
+        .chat-body {
+            flex: 1;
+            padding: 24px 28px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            max-width: 72%;
+            padding: 13px 18px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .user-msg {
+            align-self: flex-end;
+            background: rgba(0,242,255,0.04);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+
+        .ai-msg {
+            align-self: flex-start;
+            background: rgba(255,0,193,0.03);
+            border: 1px solid rgba(255,0,193,0.3);
+            color: #ddd;
+        }
+
+        .empty-state {
+            margin: auto;
+            text-align: center;
+            opacity: 0.2;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 3px;
+        }
+
+        /* MESSAGE MODAL */
+        #msg-modal {
+            display: none; position: fixed; inset: 0; z-index: 100;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+            align-items: center; justify-content: center;
+        }
+        #msg-modal.open { display: flex; }
+        .modal-box {
+            background: rgba(8,8,20,0.98); border: 1px solid var(--neon-blue);
+            border-radius: 6px; padding: 36px; width: 460px;
+            box-shadow: 0 0 40px rgba(0,242,255,0.2);
+        }
+        .modal-title { font-family: 'Orbitron', sans-serif; color: var(--neon-blue); font-size: 11px; letter-spacing: 3px; margin-bottom: 20px; }
+        #modal-input {
+            width: 100%; background: rgba(0,242,255,0.04); border: 1px solid rgba(0,242,255,0.2);
+            border-radius: 3px; padding: 12px; color: #fff; font-family: 'Fira Code', monospace;
+            font-size: 13px; outline: none; resize: vertical; min-height: 100px;
+        }
+        #modal-input:focus { border-color: var(--neon-blue); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+        .modal-send {
+            flex: 1; padding: 10px; background: transparent; border: 1px solid var(--neon-blue);
+            color: var(--neon-blue); font-family: 'Orbitron', sans-serif; font-size: 10px;
+            letter-spacing: 2px; cursor: pointer; border-radius: 3px; transition: all 0.25s;
+        }
+        .modal-send:hover { background: var(--neon-blue); color: #000; }
+        .modal-cancel {
+            padding: 10px 20px; background: transparent; border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.4); font-family: 'Orbitron', sans-serif; font-size: 10px;
+            cursor: pointer; border-radius: 3px; transition: all 0.2s;
+        }
+        .modal-cancel:hover { border-color: rgba(255,255,255,0.3); }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 16px; background: transparent; border: 1px solid rgba(0,242,255,0.3);
+            color: var(--neon-blue); font-family: 'Orbitron', sans-serif; font-size: 10px;
+            letter-spacing: 2px; cursor: pointer; border-radius: 3px; text-decoration: none;
+            transition: all 0.25s;
+        }
+        .back-btn:hover { background: var(--neon-blue); color: #000; }
     </style>
 </head>
 <body>
-    <div class="list">
-        <h3 style="padding:15px; color:#00d2ff;">USER MONITOR</h3>
-        {% for u, h in all_chats.items() %}
-        <div class="u-card" onclick="show('{{u}}')">{{ u }} ({{ h|length }})</div>
-        {% endfor %}
+
+<div id="msg-modal">
+    <div class="modal-box">
+        <div class="modal-title">⚡ MESAJ GÖNDER — <span id="modal-target-name"></span></div>
+        <textarea id="modal-input" placeholder="Kullanıcıya gönderilecek mesajı yazın..."></textarea>
+        <div class="modal-actions">
+            <button class="modal-send" onclick="sendAdminMsg()">GÖNDER</button>
+            <button class="modal-cancel" onclick="closeMsgModal()">İPTAL</button>
+        </div>
     </div>
-    <div class="main">
-        {% for u, h in all_chats.items() %}
-        <div id="u-{{u}}" class="chat-view">
-            <h2>User: {{ u }}</h2>
-            {% for m in h %}
-            <div class="box"><b>User:</b> {{ m.user }}</div>
-            <div class="box" style="color:#00d2ff;"><b>DABI:</b> {{ m.ai }}</div>
-            <hr style="border-color:#222;">
+</div>
+
+<div class="dashboard">
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h1>DABI <span style="font-weight:300;color:#fff;">CORE</span></h1>
+            <div class="sub">ADMINISTRATOR ACCESS ONLY</div>
+        </div>
+
+        <div class="user-list">
+            {% for u in users %}
+            <div class="user-item" id="row-{{ u.username }}" onclick="loadUserChat(this, '{{ u.username }}')">
+                <div class="user-item-top">
+                    <i class="fas fa-microchip user-icon"></i>
+                    <span class="user-name-txt">{{ u.username }}</span>
+                    <div class="user-badges">
+                        {% if u.is_admin %}<span class="badge badge-admin">ROOT</span>{% endif %}
+                        {% if u.is_banned %}<span class="badge badge-banned">BANNED</span>{% else %}<span class="badge badge-ok">ACTIVE</span>{% endif %}
+                    </div>
+                </div>
+                <div class="user-ip-txt">{{ u.last_ip or 'IP: bilinmiyor' }}</div>
+                <div class="action-row">
+                    <button class="act-btn act-msg" onclick="openMsgModal('{{ u.username }}', event)">MESAJ</button>
+                    {% if not u.is_admin %}
+                    <button class="act-btn act-ban" onclick="banUser('{{ u.username }}', event)">IP BAN</button>
+                    <button class="act-btn act-unban" onclick="unbanUser('{{ u.username }}', event)">UNBAN</button>
+                    <button class="act-btn act-del" onclick="deleteUser('{{ u.username }}', event)">SİL</button>
+                    {% endif %}
+                </div>
+            </div>
             {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    <script>
-        function show(u) {
-            document.querySelectorAll('.chat-view').forEach(e => e.classList.remove('active'));
-            document.getElementById('u-' + u).classList.add('active');
-        }
-    </script>
+
+        <div class="system-footer">
+            <span><i class="fas fa-terminal"></i> ENCRYPTED CONNECTION</span>
+            <span id="clock"></span>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:3px;color:rgba(0,242,255,0.5);">SYSTEM ADMINISTRATION PANEL</div>
+            <a href="/" class="back-btn"><i class="fas fa-arrow-left"></i> CHAT</a>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">TOTAL DATA PACKETS</div>
+                <div class="stat-value stat-blue">{{ total_messages }} <span style="font-size:14px;">MSG</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">SYSTEM STATUS</div>
+                <div class="stat-value stat-green">STABLE</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">NEURAL LINK</div>
+                <div class="stat-value stat-pink">ACTIVE</div>
+            </div>
+        </div>
+
+        <div class="chat-viewer">
+            <div class="chat-header">
+                <div id="target-label">SYSTEM READY. WAITING FOR SELECTION...</div>
+                <div id="msg-badge"></div>
+            </div>
+            <div class="chat-body" id="chat-stream">
+                <div class="empty-state">
+                    <i class="fas fa-project-diagram fa-3x" style="margin-bottom:16px;"></i>
+                    <p>SELECT A SUBJECT TO DECRYPT CHAT HISTORY</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+const masterData = {{ all_chats_raw | tojson | safe }};
+let msgModalTarget = '';
+
+{% if users %}
+window.onload = () => {
+    const first = '{{ users[0].username }}';
+    loadUserChat(document.getElementById('row-' + first), first);
+};
+{% endif %}
+
+function loadUserChat(element, username) {
+    document.querySelectorAll('.user-item').forEach(i => i.classList.remove('active'));
+    element.classList.add('active');
+    document.getElementById('target-label').textContent = 'TARGET: ' + username.toUpperCase();
+    const stream = document.getElementById('chat-stream');
+    stream.innerHTML = '';
+    const history = masterData[username] || [];
+    document.getElementById('msg-badge').textContent = history.length + ' LOGS FOUND';
+    if (!history.length) {
+        stream.innerHTML = '<div class="empty-state"><i class="fas fa-database fa-2x" style="margin-bottom:12px;"></i><p>NO DATA FOUND FOR THIS SUBJECT.</p></div>';
+        return;
+    }
+    history.forEach(log => {
+        const u = document.createElement('div');
+        u.className = 'message user-msg';
+        u.textContent = log.user;
+        const a = document.createElement('div');
+        a.className = 'message ai-msg';
+        a.textContent = log.ai;
+        stream.appendChild(u);
+        stream.appendChild(a);
+    });
+    stream.scrollTop = stream.scrollHeight;
+}
+
+setInterval(() => {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('tr-TR', {hour12:false}) + ' // CORE';
+}, 1000);
+
+function openMsgModal(username, e) {
+    e.stopPropagation();
+    msgModalTarget = username;
+    document.getElementById('modal-target-name').textContent = username.toUpperCase();
+    document.getElementById('modal-input').value = '';
+    document.getElementById('msg-modal').classList.add('open');
+}
+function closeMsgModal() { document.getElementById('msg-modal').classList.remove('open'); }
+
+async function sendAdminMsg() {
+    const msg = document.getElementById('modal-input').value.trim();
+    if (!msg) return;
+    await fetch('/admin/send_message', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username: msgModalTarget, message: msg})
+    });
+    closeMsgModal();
+}
+
+async function banUser(username, e) {
+    e.stopPropagation();
+    if (!confirm(username + ' kullanıcısını ve IP\'sini yasakla?')) return;
+    await fetch('/admin/ban', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username})});
+    location.reload();
+}
+
+async function unbanUser(username, e) {
+    e.stopPropagation();
+    if (!confirm(username + ' yasağını kaldır?')) return;
+    await fetch('/admin/unban', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username})});
+    location.reload();
+}
+
+async function deleteUser(username, e) {
+    e.stopPropagation();
+    if (!confirm(username + ' kullanıcısını ve tüm geçmişini SİL? Bu işlem geri alınamaz!')) return;
+    await fetch('/admin/delete_user', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username})});
+    location.reload();
+}
+</script>
 </body>
 </html>

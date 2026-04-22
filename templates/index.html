@@ -1,431 +1,461 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DABI | Neural Interface v4.0</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;500&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --neon-cyan: #00f2ff;
-            --neon-blue: #0062ff;
-            --neon-purple: #bc00ff;
-            --bg-deep: #020205;
-            --glass-bg: rgba(10, 10, 15, 0.85);
-            --border-glow: rgba(0, 242, 255, 0.3);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DABI — Neural Interface v4.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/tokyo-night-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 
-        body {
-            background: var(--bg-deep);
-            color: #e0e0e0;
-            font-family: 'Fira Code', monospace;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            overflow: hidden;
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 98, 255, 0.05) 0%, transparent 80%),
-                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 100%, 100% 4px, 4px 100%;
-        }
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --neon-blue: #00f2ff;
+    --neon-pink: #ff00c1;
+    --bg: #0a0a12;
+    --sidebar-bg: #0d0d18;
+    --border: rgba(255,255,255,0.07);
+}
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(0,242,255,0.3); border-radius: 2px; }
+body {
+    background: var(--bg); color: #ccc;
+    font-family: 'Fira Code', monospace;
+    height: 100vh; display: flex; overflow: hidden;
+}
 
-        /* Sol Panel - Sistem Durumu */
-        aside {
-            width: 320px;
-            background: var(--glass-bg);
-            border-right: 1px solid var(--border-glow);
-            display: flex;
-            flex-direction: column;
-            padding: 25px;
-            backdrop-filter: blur(15px);
-            z-index: 10;
-        }
+/* SIDEBAR */
+.sidebar {
+    width: 200px; min-width: 200px;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 20px 14px;
+}
+.logo-mark {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 24px; padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+.logo-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: linear-gradient(135deg, rgba(0,242,255,0.2), rgba(255,0,193,0.2));
+    border: 1px solid rgba(0,242,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--neon-blue); font-size: 14px;
+}
+.logo-text { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; color: var(--neon-blue); letter-spacing: 3px; }
+.logo-sub { font-size: 8px; color: rgba(255,255,255,0.2); letter-spacing: 1px; }
 
-        .logo-area {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+.user-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px;
+    margin-bottom: 24px;
+    display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,242,255,0.3), rgba(188,0,255,0.3));
+    border: 1px solid rgba(0,242,255,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--neon-blue); flex-shrink: 0;
+}
+.user-name { font-size: 13px; color: #eee; font-weight: 500; }
+.user-rank { font-size: 9px; color: rgba(0,242,255,0.5); letter-spacing: 1px; }
+.online-dot { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 9px; color: #00ff88; }
+.dot-green { width: 6px; height: 6px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 5px #00ff88; }
 
-        .logo-area h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            margin: 0;
-            background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.5));
-            letter-spacing: 8px;
-        }
+.monitor-title { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.2); margin-bottom: 12px; text-transform: uppercase; }
+.monitor-item { margin-bottom: 14px; }
+.monitor-label { display: flex; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+.monitor-val { color: rgba(255,255,255,0.7); }
+.prog-bg { height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+.prog-blue { background: var(--neon-blue); box-shadow: 0 0 6px var(--neon-blue); }
+.prog-pink { background: var(--neon-pink); box-shadow: 0 0 6px var(--neon-pink); }
 
-        .sys-monitor {
-            flex: 1;
-            font-size: 12px;
-            color: #888;
-        }
+.sidebar-nav { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
+.nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 6px;
+    font-size: 11px; color: rgba(255,255,255,0.35);
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+    border: 1px solid transparent;
+}
+.nav-item i { width: 14px; text-align: center; }
+.nav-item:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); border-color: var(--border); }
+.nav-item.danger:hover { color: #ff4444; background: rgba(255,68,68,0.06); border-color: rgba(255,68,68,0.15); }
 
-        .stat-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid #222;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
+/* MAIN */
+main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
 
-        .stat-label { color: var(--neon-cyan); font-weight: bold; margin-bottom: 8px; display: block; }
-        .progress-bg { width: 100%; height: 6px; background: #111; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); transition: 0.5s; }
+.topbar {
+    height: 48px; min-height: 48px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 28px; background: rgba(10,10,18,0.8);
+}
+.status-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: rgba(255,255,255,0.35); }
+.status-dot-sm { width: 6px; height: 6px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 5px #00ff88; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.5);opacity:0.5;} }
+.topbar-clock { font-size: 10px; color: rgba(255,255,255,0.2); }
 
-        /* Ana Gövde */
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+/* CHAT AREA & MESSAGES */
+#chat-container { flex: 1; overflow-y: auto; padding: 0 28px; display: flex; flex-direction: column; }
+.welcome-state { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 40px 0; }
+.welcome-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(0,242,255,0.15), rgba(188,0,255,0.15));
+    border: 1px solid rgba(0,242,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: var(--neon-blue); box-shadow: 0 0 20px rgba(0,242,255,0.1);
+}
+.welcome-title { font-family: 'Orbitron', sans-serif; font-size: 20px; letter-spacing: 6px; color: var(--neon-blue); text-shadow: 0 0 15px rgba(0,242,255,0.3); }
+.welcome-sub { font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; line-height: 1.7; max-width: 360px; }
 
-        header {
-            height: 70px;
-            border-bottom: 1px solid var(--border-glow);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 30px;
-            background: rgba(0,0,0,0.3);
-        }
+.chat-msgs { display: flex; flex-direction: column; gap: 20px; padding: 28px 0; }
 
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-        .dot { height: 8px; width: 8px; background: var(--neon-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--neon-cyan); animation: pulse 1.5s infinite; }
+.msg-wrap { 
+    display: flex; flex-direction: column; max-width: 85%; 
+    animation: fadeInUp 0.4s ease-out forwards; 
+}
+.msg-wrap.user { align-self: flex-end; }
+.msg-wrap.ai { align-self: flex-start; }
+.msg-meta { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.2); margin-bottom: 5px; text-transform: uppercase; }
+.msg-wrap.user .msg-meta { text-align: right; }
 
-        /* Sohbet Alanı */
-        #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            scroll-behavior: smooth;
-        }
+.msg { padding: 14px 18px; border-radius: 10px; font-size: 13px; line-height: 1.7; word-break: break-word; position: relative; }
+.msg.user {
+    background: rgba(0,242,255,0.07); border: 1px solid rgba(0,242,255,0.2);
+    color: #e8f8ff; border-radius: 10px 10px 2px 10px; white-space: pre-wrap;
+}
+.msg.ai {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    color: #ddd; border-radius: 10px 10px 10px 2px;
+}
 
-        .message-wrapper {
-            display: flex;
-            flex-direction: column;
-            max-width: 80%;
-        }
+.typing::after {
+    content: '_';
+    display: inline-block;
+    color: var(--neon-blue);
+    animation: blink 0.7s infinite;
+    margin-left: 3px;
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        .user-wrapper { align-self: flex-end; }
-        .ai-wrapper { align-self: flex-start; }
+/* CODE BOX */
+.code-container {
+    position: relative; margin: 15px 0;
+    background: #1a1b26; border-radius: 8px;
+    border: 1px solid var(--border); overflow: hidden;
+}
+.code-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; background: rgba(255,255,255,0.05);
+    font-size: 11px; color: var(--neon-blue); border-bottom: 1px solid var(--border);
+}
+.code-actions { display: flex; gap: 15px; }
+.code-btn { cursor: pointer; color: rgba(255,255,255,0.4); transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+.code-btn:hover { color: #fff; }
+pre { padding: 14px; overflow-x: auto; margin: 0; }
+code { font-family: 'Fira Code', monospace !important; font-size: 12px !important; }
 
-        .message {
-            padding: 18px 25px;
-            font-size: 15px;
-            line-height: 1.6;
-            position: relative;
-            border-radius: 2px;
-            white-space: pre-wrap;
-        }
+.preview-box { background: white; width: 100%; height: 350px; border: none; border-top: 1px solid var(--border); display: none; }
 
-        .user-msg {
-            background: rgba(0, 242, 255, 0.03);
-            border: 1px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            box-shadow: inset 0 0 15px rgba(0, 242, 255, 0.05);
-        }
+/* INPUT */
+.input-area { padding: 16px 28px 24px; flex-shrink: 0; }
+.input-box {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+}
+#userInput {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: #eee; font-family: 'Fira Code', monospace; font-size: 13px; padding: 6px 4px;
+}
+#sendBtn {
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    background: var(--neon-blue); border: none; border-radius: 8px; color: #000;
+    font-size: 14px; cursor: pointer; transition: all 0.25s;
+}
+#sendBtn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
-        .ai-msg {
-            background: rgba(188, 0, 255, 0.03);
-            border: 1px solid var(--neon-purple);
-            color: #fff;
-            box-shadow: inset 0 0 15px rgba(188, 0, 255, 0.05);
-        }
-
-        .meta {
-            font-size: 10px;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #555;
-        }
-
-        /* Giriş Paneli */
-        .input-area {
-            padding: 30px;
-            background: linear-gradient(to top, var(--bg-deep), transparent);
-        }
-
-        .input-wrapper {
-            background: var(--glass-bg);
-            border: 1px solid var(--border-glow);
-            border-radius: 4px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
-        }
-
-        input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-family: 'Fira Code', monospace;
-            font-size: 16px;
-            padding: 10px;
-            outline: none;
-        }
-
-        .action-btn {
-            background: transparent;
-            border: 1px solid #333;
-            color: #666;
-            padding: 10px 15px;
-            cursor: pointer;
-            transition: 0.3s;
-            border-radius: 3px;
-        }
-
-        .action-btn:hover {
-            color: var(--neon-cyan);
-            border-color: var(--neon-cyan);
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        #sendBtn {
-            background: var(--neon-cyan);
-            color: #000;
-            border: none;
-            padding: 12px 30px;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: bold;
-            cursor: pointer;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-        }
-
-        /* Animasyonlar */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .loading-dots:after {
-            content: '.';
-            animation: dots 1.5s steps(5, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
-        }
-
-        /* Reset Butonu Özel */
-        .danger-btn {
-            border: 1px solid #ff004c;
-            color: #ff004c;
-            background: transparent;
-            padding: 8px 15px;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            font-size: 10px;
-        }
-        .danger-btn:hover { background: #ff004c; color: #fff; box-shadow: 0 0 15px #ff004c; }
-
-    </style>
+/* OVERLAY */
+#admin-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+}
+#admin-overlay.show { display: flex; }
+.admin-box { background: rgba(8,8,20,0.98); border: 1px solid var(--neon-pink); border-radius: 10px; padding: 40px; text-align: center; color: #fff; }
+#fileInput { display: none; }
+</style>
 </head>
 <body>
 
-    <aside>
-        <div class="logo-area">
-            <h1>DABI</h1>
-            <div style="font-size: 10px; letter-spacing: 2px; color: #555;">NEURAL INTERFACE V4.0</div>
+<div id="admin-overlay">
+    <div class="admin-box">
+        <div class="admin-box-title" style="color:var(--neon-pink); letter-spacing:2px; margin-bottom:15px; font-weight: bold;">⚠ SİSTEM MESAJI</div>
+        <div id="admin-box-msg" style="margin-bottom:20px; font-size: 14px; line-height: 1.5;"></div>
+        <button onclick="document.getElementById('admin-overlay').classList.remove('show')" style="padding:8px 20px; background:transparent; border:1px solid var(--neon-pink); color:var(--neon-pink); cursor:pointer; font-family: 'Orbitron'; font-size: 11px;">TAMAM</button>
+    </div>
+</div>
+
+<aside class="sidebar">
+    <div class="logo-mark">
+        <div class="logo-icon"><i class="fas fa-brain"></i></div>
+        <div><div class="logo-text">DABI</div><div class="logo-sub">NEURAL INTERFACE V4.0</div></div>
+    </div>
+    <div class="user-card">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+        <div>
+            <div class="user-name">{{ username }}</div>
+            <div class="user-rank">Authorized User</div>
+            <div class="online-dot"><span class="dot-green"></span>Online</div>
         </div>
+    </div>
+    <div class="monitor-title">System Monitor</div>
+    <div class="monitor-item">
+        <div class="monitor-label"><span>CPU</span><span id="cpu-val">42%</span></div>
+        <div class="prog-bg"><div class="prog-fill prog-blue" id="cpu-bar" style="width:42%"></div></div>
+    </div>
+    <div class="monitor-item">
+        <div class="monitor-label"><span>MEM</span><span id="mem-val">71%</span></div>
+        <div class="prog-bg"><div class="prog-fill prog-pink" id="mem-bar" style="width:71%"></div></div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="#" class="nav-item" onclick="wipeMemory()"><i class="fas fa-trash"></i> Wipe Memory</a>
+        <a href="/logout" class="nav-item danger"><i class="fas fa-sign-out-alt"></i> Sign Out</a>
+    </nav>
+</aside>
 
-        <div class="sys-monitor">
-            <div class="stat-card">
-                <span class="stat-label">CPU USAGE</span>
-                <div class="progress-bg"><div class="progress-fill" id="cpu-bar" style="width: 45%;"></div></div>
-                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-                    <span id="cpu-val">45%</span><span>CORE: 12</span>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <span class="stat-label">NEURAL MEMORY</span>
-                <div class="progress-bg"><div class="progress-fill" style="width: 72%; background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple);"></div></div>
-                <div style="display: flex; justify-content: space-between; margin-top: 5px;">
-                    <span>72%</span><span>SYNCED</span>
-                </div>
-            </div>
-
-            <div class="stat-card" style="margin-top: 40px;">
-                <span class="stat-label">OPERATOR INFO</span>
-                <div style="color: #fff; font-size: 14px; border-left: 2px solid var(--neon-cyan); padding-left: 10px;">
-                    ID: {{ username.upper() }}<br>
-                    RANK: {% if is_admin %}LEVEL 10 (ROOT){% else %}AUTHORIZED USER{% endif %}<br>
-                    STATUS: ACTIVE
-                </div>
-            </div>
-
-            <div style="margin-top: auto; padding-bottom: 20px;">
-                <button class="danger-btn" onclick="resetSystem()"><i class="fas fa-radiation"></i> WIPE MEMORY</button>
-            </div>
+<main>
+    <div class="topbar">
+        <div class="status-row"><div class="status-dot-sm"></div><span>DABI Linked — Şifreli</span></div>
+        <div class="topbar-clock" id="clock">00:00:00</div>
+    </div>
+    <div id="chat-container">
+        <div class="welcome-state" id="welcome-state">
+            <div class="welcome-icon"><i class="fas fa-brain"></i></div>
+            <div class="welcome-title">DABI</div>
+            <div class="welcome-sub">Neural link established. System is ready for data processing.</div>
         </div>
-    </aside>
-
-    <main>
-        <header>
-            <div class="status-badge">
-                <div class="dot"></div>
-                <span>SİSTEM ÇEVRİMİÇİ // ŞİFRELİ BAĞLANTI</span>
-            </div>
-            <div style="font-family: 'Orbitron'; letter-spacing: 2px;">
-                {% if is_admin %}
-                <a href="/admin/chats" style="color: var(--neon-cyan); text-decoration: none; font-size: 12px; border: 1px solid var(--neon-cyan); padding: 5px 10px;">MONITORING PANEL</a>
-                {% endif %}
-                <a href="/logout" style="color: #666; text-decoration: none; font-size: 12px; margin-left: 20px;">LOGOUT</a>
-            </div>
-        </header>
-
-        <div id="chat-container">
-            </div>
-
-        <div class="input-area">
-            <div class="input-wrapper">
-                <button class="action-btn" title="Dosya Ekle"><i class="fas fa-paperclip"></i></button>
-                <input type="text" id="userInput" placeholder="Neural komut iletin..." autocomplete="off" autofocus>
-                <button id="sendBtn" onclick="sendMessage()">EXECUTE</button>
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <span style="font-size: 10px; color: #444;">QUICK_CMD:</span>
-                <button class="action-btn" style="font-size: 9px; padding: 4px 8px;" onclick="quickCmd('Kod yazımı için hazırlan')">CODE_MOD</button>
-                <button class="action-btn" style="font-size: 9px; padding: 4px 8px;" onclick="quickCmd('Özet çıkar')">SUMMARY</button>
-                <button class="action-btn" style="font-size: 9px; padding: 4px 8px;" onclick="quickCmd('Güvenlik analizi yap')">SEC_CHECK</button>
-            </div>
+        <div class="chat-msgs" id="chat-msgs" style="display:none;"></div>
+    </div>
+    <div class="input-area">
+        <div id="file-preview"></div>
+        <input type="file" id="fileInput" accept=".txt,.py,.pdf" onchange="handleFile(this)">
+        <div class="input-box">
+            <button style="background:none; border:none; color:#555; cursor:pointer; padding:0 10px;" onclick="document.getElementById('fileInput').click()"><i class="fas fa-paperclip"></i></button>
+            <input type="text" id="userInput" placeholder="Command DABI..." autocomplete="off" autofocus>
+            <button id="sendBtn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
         </div>
-    </main>
+    </div>
+</main>
 
-    <script>
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('userInput');
+<script>
+const chatMsgs = document.getElementById('chat-msgs');
+const welcomeState = document.getElementById('welcome-state');
+const inputEl = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+let pendingFileContent = '';
+let pendingFileName = '';
+let hasMessages = false;
 
-        // Sayfa yüklendiğinde geçmişi çek
-        window.onload = async () => {
-            const res = await fetch('/get_history');
-            const history = await res.json();
-            history.forEach(item => {
-                appendMessage('user', item.user);
-                appendMessage('ai', item.ai);
-            });
-            scrollChat();
-            startRandomStats();
-        };
-
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            appendMessage('user', text);
-            userInput.value = '';
-            scrollChat();
-
-            // Loading göster
-            const loadingId = 'load-' + Date.now();
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message-wrapper ai-wrapper';
-            loadingDiv.innerHTML = `
-                <div class="meta">DABI SYSTEM</div>
-                <div class="message ai-msg loading-dots" id="${loadingId}">VERİ İŞLENİYOR</div>
-            `;
-            chatContainer.appendChild(loadingDiv);
-            scrollChat();
-
-            try {
-                const response = await fetch('/ask', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: text })
-                });
-                const data = await response.json();
-                
-                // Loading'i kaldır ve gerçek cevabı daktilo ile yaz
-                document.getElementById(loadingId).classList.remove('loading-dots');
-                typeWriter(loadingId, data.response);
-            } catch (err) {
-                document.getElementById(loadingId).innerText = "ERROR: NEURAL LINK ERROR.";
+// 1. GEÇMİŞİ YÜKLE
+window.onload = async () => {
+    try {
+        const res = await fetch('/get_history');
+        const hist = await res.json();
+        if (hist && hist.length > 0) {
+            showChat();
+            for (const item of hist) {
+                appendMsg('user', item.user, false);
+                appendMsg('ai', item.ai, false);
             }
+            scrollBottom();
         }
+    } catch(e) { console.error("History error"); }
+    statusLoop(); // Admin kontrol döngüsünü başlat
+};
 
-        function appendMessage(sender, text) {
-            const wrapper = document.createElement('div');
-            wrapper.className = `message-wrapper ${sender}-wrapper`;
-            const meta = sender === 'user' ? 'OPERATOR' : 'DABI CORE';
-            wrapper.innerHTML = `
-                <div class="meta">${meta}</div>
-                <div class="message ${sender}-msg">${text}</div>
-            `;
-            chatContainer.appendChild(wrapper);
-            scrollChat();
-        }
+// 2. ADMIN PANELİNDEN GELEN MESAJLARI KONTROL ET (polling)
+async function statusLoop() {
+    while (true) {
+        await new Promise(r => setTimeout(r, 1000)); // 1 saniyede bir kontrol et
+        try {
+            const r = await fetch('/status_check');
+            const d = await r.json();
+            if (d.action === 'banned') window.location.href = '/logout';
+            if (d.action === 'message') {
+                document.getElementById('admin-box-msg').textContent = d.message;
+                document.getElementById('admin-overlay').classList.add('show');
+            }
+        } catch(e) {}
+    }
+}
 
-        function typeWriter(id, text) {
-            const el = document.getElementById(id);
-            el.innerText = "";
-            let i = 0;
-            function write() {
+// Saat ve Sistem Simülasyonu
+setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString('tr-TR'); }, 1000);
+setInterval(() => {
+    const cpu = Math.floor(Math.random() * 30 + 20);
+    const mem = Math.floor(Math.random() * 15 + 60);
+    document.getElementById('cpu-bar').style.width = cpu + '%';
+    document.getElementById('cpu-val').textContent = cpu + '%';
+    document.getElementById('mem-bar').style.width = mem + '%';
+    document.getElementById('mem-val').textContent = mem + '%';
+}, 5000);
+
+function showChat() {
+    welcomeState.style.display = 'none';
+    chatMsgs.style.display = 'flex';
+    hasMessages = true;
+}
+
+function renderContent(text) {
+    marked.setOptions({
+        highlight: function(code, lang) { return hljs.highlightAuto(code).value; },
+        breaks: true
+    });
+    const rawHtml = marked.parse(text);
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = rawHtml;
+    tempDiv.querySelectorAll('pre').forEach(pre => {
+        const codeEl = pre.querySelector('code');
+        const lang = codeEl ? (codeEl.className.replace('language-', '') || 'code') : 'code';
+        const container = document.createElement('div');
+        container.className = 'code-container';
+        container.innerHTML = `
+            <div class="code-header">
+                <span>${lang.toUpperCase()}</span>
+                <div class="code-actions">
+                    <span class="code-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</span>
+                    ${(lang === 'html' || lang === 'xml') ? `<span class="code-btn" onclick="togglePreview(this)"><i class="fas fa-eye"></i> Preview</span>` : ''}
+                </div>
+            </div>
+            <pre>${pre.innerHTML}</pre>
+            <iframe class="preview-box"></iframe>`;
+        pre.replaceWith(container);
+    });
+    return tempDiv.innerHTML;
+}
+
+async function appendMsg(sender, text, typeEffect = true) {
+    if (!hasMessages) showChat();
+    const wrap = document.createElement('div');
+    wrap.className = `msg-wrap ${sender}`;
+    const meta = sender === 'user' ? 'YOU' : 'DABI';
+    wrap.innerHTML = `<div class="msg-meta">${meta}</div><div class="msg ${sender}"></div>`;
+    chatMsgs.appendChild(wrap);
+    const msgEl = wrap.querySelector('.msg');
+
+    if (sender === 'user' || !typeEffect) {
+        msgEl.innerHTML = sender === 'user' ? text : renderContent(text);
+        scrollBottom();
+    } else {
+        msgEl.classList.add('typing');
+        let i = 0;
+        const speed = 10; 
+        return new Promise(resolve => {
+            function type() {
                 if (i < text.length) {
-                    el.innerText += text.charAt(i);
-                    i++;
-                    setTimeout(write, 15);
-                    scrollChat();
+                    msgEl.innerHTML = renderContent(text.substring(0, i + 1));
+                    i += 2; 
+                    scrollBottom();
+                    setTimeout(type, speed);
+                } else {
+                    msgEl.innerHTML = renderContent(text);
+                    msgEl.classList.remove('typing');
+                    scrollBottom();
+                    resolve();
                 }
             }
-            write();
-        }
-
-        function scrollChat() {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        async function resetSystem() {
-            if(confirm("UYARI: Tüm neural hafıza kalıcı olarak silinecek! Devam edilsin mi?")) {
-                await fetch('/reset', { method: 'POST' });
-                chatContainer.innerHTML = '<div style="color:red; text-align:center;">--- BELLEK SIFIRLANDI ---</div>';
-                setTimeout(() => location.reload(), 1000);
-            }
-        }
-
-        function quickCmd(cmd) {
-            userInput.value = cmd;
-            sendMessage();
-        }
-
-        // Simüle edilmiş CPU hareketleri
-        function startRandomStats() {
-            setInterval(() => {
-                const cpu = Math.floor(Math.random() * (60 - 30) + 30);
-                document.getElementById('cpu-bar').style.width = cpu + '%';
-                document.getElementById('cpu-val').innerText = cpu + '%';
-            }, 3000);
-        }
-
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
+            type();
         });
-    </script>
+    }
+}
+
+async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text && !pendingFileContent) return;
+    sendBtn.disabled = true;
+    const displayText = pendingFileName ? `[File: ${pendingFileName}]\n${text}` : text;
+    appendMsg('user', displayText, false);
+    inputEl.value = '';
+    const fc = pendingFileContent;
+    clearFile();
+
+    const loadWrap = document.createElement('div');
+    loadWrap.className = 'msg-wrap ai';
+    loadWrap.innerHTML = `<div class="msg-meta">DABI</div><div class="msg ai"><i class="fas fa-circle-notch fa-spin"></i> Processing...</div>`;
+    chatMsgs.appendChild(loadWrap);
+    scrollBottom();
+
+    try {
+        const res = await fetch('/ask', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({prompt: text, file_content: fc})
+        });
+        const data = await res.json();
+        loadWrap.remove();
+        await appendMsg('ai', data.response, true); 
+    } catch(e) {
+        loadWrap.querySelector('.msg').innerHTML = '<span style="color:#ff4444">ERROR: NEURAL LINK TIMEOUT</span>';
+    }
+    sendBtn.disabled = false;
+}
+
+function copyCode(btn) {
+    const code = btn.closest('.code-container').querySelector('code').innerText;
+    navigator.clipboard.writeText(code);
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 2000);
+}
+
+function togglePreview(btn) {
+    const container = btn.closest('.code-container');
+    const iframe = container.querySelector('.preview-box');
+    const code = container.querySelector('code').innerText;
+    if (iframe.style.display === 'block') {
+        iframe.style.display = 'none';
+        btn.innerHTML = '<i class="fas fa-eye"></i> Preview';
+    } else {
+        iframe.style.display = 'block';
+        iframe.srcdoc = code;
+        btn.innerHTML = '<i class="fas fa-eye-slash"></i> Close';
+    }
+}
+
+function scrollBottom() { const c = document.getElementById('chat-container'); c.scrollTop = c.scrollHeight; }
+
+async function wipeMemory() {
+    if (!confirm('Tüm geçmiş silinecek?')) return;
+    await fetch('/reset', {method: 'POST'});
+    location.reload();
+}
+
+inputEl.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+
+async function handleFile(el) {
+    const file = el.files[0]; if (!file) return;
+    const fd = new FormData(); fd.append('file', file);
+    const res = await fetch('/upload_file', {method: 'POST', body: fd});
+    const data = await res.json();
+    if (data.success) {
+        pendingFileContent = data.content; pendingFileName = data.filename;
+        document.getElementById('file-preview').innerHTML = `<div style="color:var(--neon-blue); font-size:11px; margin-bottom:10px;"><i class="fas fa-file"></i> ${data.filename} <span onclick="clearFile()" style="cursor:pointer; color:red; margin-left:10px;">X</span></div>`;
+    }
+}
+function clearFile() { pendingFileContent = ''; pendingFileName = ''; document.getElementById('file-preview').innerHTML = ''; }
+</script>
 </body>
 </html>
