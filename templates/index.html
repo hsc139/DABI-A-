@@ -9,15 +9,14 @@
 
     <script>
     (function() {
-        if (!window.location.hash) {
-            // pathname zaten "/" olduğu için sonuna sadece "#" ekliyoruz
-            var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?n';
+        // Mevcut URL'de "v=" parametresi yoksa çalış
+        if (!window.location.search.includes('v=')) {
+            // Benzersiz bir zaman damgası oluştur (Her milisaniyede değişir)
+            var uniqueId = new Date().getTime();
+            // URL'nin sonuna ?v=123456789 ekle
+            var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?v=' + uniqueId;
             
-            // Eğer pathname sonunda "/" yoksa ekleyip sonra "#" koyar (garanti yöntem)
-            if (!window.location.pathname.endsWith('/')) {
-                newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '/?n';
-            }
-
+            // Adresi sessizce değiştir
             window.history.replaceState(null, null, newUrl);
         }
     })();
