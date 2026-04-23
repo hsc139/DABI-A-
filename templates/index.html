@@ -8,23 +8,18 @@
     <meta http-equiv="Expires" content="0">
 
     <script>
-    // Sayfa yüklendiğinde çalışır
     (function() {
-        // Eğer URL'nin sonunda /# yoksa
-        if (!window.location.href.endsWith('/#')) {
-            // URL'yi al ve sonuna /# ekle
-            var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '/#';
-            // Sayfayı yenilemeden adresi değiştir
-            window.history.replaceState({ path: newUrl }, '', newUrl);
-        }
+        if (!window.location.hash) {
+            // pathname zaten "/" olduğu için sonuna sadece "#" ekliyoruz
+            var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '#';
+            
+            // Eğer pathname sonunda "/" yoksa ekleyip sonra "#" koyar (garanti yöntem)
+            if (!window.location.pathname.endsWith('/')) {
+                newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '/#';
+            }
 
-        // İkonları tazelemek için zaman damgası (Timestamp) ekle
-        var now = new Date().getTime();
-        var icon = document.querySelector("link[rel='icon']");
-        var apple = document.querySelector("link[rel='apple-touch-icon']");
-        
-        if (icon) icon.href = icon.href.split('?')[0] + '?v=' + now;
-        if (apple) apple.href = apple.href.split('?')[0] + '?v=' + now;
+            window.history.replaceState(null, null, newUrl);
+        }
     })();
 </script>
 
