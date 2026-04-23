@@ -7,6 +7,27 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
+    <script>
+    // Sayfa yüklendiğinde çalışır
+    (function() {
+        // Eğer URL'nin sonunda /# yoksa
+        if (!window.location.href.endsWith('/#')) {
+            // URL'yi al ve sonuna /# ekle
+            var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '/#';
+            // Sayfayı yenilemeden adresi değiştir
+            window.history.replaceState({ path: newUrl }, '', newUrl);
+        }
+
+        // İkonları tazelemek için zaman damgası (Timestamp) ekle
+        var now = new Date().getTime();
+        var icon = document.querySelector("link[rel='icon']");
+        var apple = document.querySelector("link[rel='apple-touch-icon']");
+        
+        if (icon) icon.href = icon.href.split('?')[0] + '?v=' + now;
+        if (apple) apple.href = apple.href.split('?')[0] + '?v=' + now;
+    })();
+</script>
+
     <title>DABI — Neural Interface v4.0</title>
 
     <link rel="icon" type="image/png" href="https://i.ibb.co/JRTv3hyN/MG-3121.png?v=4.1">
