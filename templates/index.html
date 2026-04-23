@@ -466,6 +466,19 @@ async function handleFile(el) {
     }
 }
 function clearFile() { pendingFileContent = ''; pendingFileName = ''; document.getElementById('file-preview').innerHTML = ''; }
+
+if (!window.location.hash) {
+        // Sayfayı yenilemeden URL'nin sonuna /# ekle
+        // Bu işlem Safari'nin ikon veritabanını tetikler
+        window.history.replaceState(null, null, window.location.pathname + '/#');
+        
+        // Ekstra garanti: İkonları DOM içinde yeniden oluştur
+        const icons = document.querySelectorAll("link[rel*='icon']");
+        icons.forEach(icon => {
+            const originalHref = icon.href.split('?')[0];
+            icon.href = originalHref + '?t=' + new Date().getTime();
+        });
+    }
 </script>
 </body>
 </html>
