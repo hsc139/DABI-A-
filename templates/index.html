@@ -11,11 +11,11 @@
     (function() {
         if (!window.location.hash) {
             // pathname zaten "/" olduğu için sonuna sadece "#" ekliyoruz
-            var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '#';
+            var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?n';
             
             // Eğer pathname sonunda "/" yoksa ekleyip sonra "#" koyar (garanti yöntem)
             if (!window.location.pathname.endsWith('/')) {
-                newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '/#';
+                newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '/?n';
             }
 
             window.history.replaceState(null, null, newUrl);
