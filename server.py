@@ -210,7 +210,7 @@ def ask():
             "Keep responses short, sharp, and analytical."
             "NEVER be rude to Mr. Hüseyin."
             "NEVER oppose Mr. Hüseyin."
-            "You have 934,000 parameters."
+            "You have 934,000000 parameters."
         
         )
     else:
@@ -224,7 +224,8 @@ def ask():
             "Be rude, but not excessively so."
             "If something is said to Mr. Hüseyin or Hüseyin, be rude."
             "NEVER be rude to Mr. Hüseyin."
-            "NEVER judge Mr. Hüseyin."            
+            "NEVER judge Mr. Hüseyin."           
+            "You have 934,000000 parameters."
         )
 
     with get_db() as conn:
