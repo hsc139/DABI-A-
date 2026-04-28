@@ -90,5 +90,15 @@ input::placeholder { color: rgba(0,242,255,0.2); }
   {% if error %}<div class="error">{{ error }}</div>{% endif %}
   <div class="link-row">Sistemde kayıtlı değil misiniz? <a href="/register">Yeni Profil Oluştur</a></div>
 </div>
+
+<script>
+    // Eğer kullanıcı login sayfasındaysa, geri tuşuna basınca index'e gitmesini engeller
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.go(1);
+    };
+</script>
+
+
 </body>
 </html>
