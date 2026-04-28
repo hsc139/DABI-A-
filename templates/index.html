@@ -280,6 +280,28 @@ code { font-family: 'Fira Code', monospace !important; font-size: 12px !importan
 </main>
 
 <script>
+// Sayfa her gösterildiğinde (geri tuşu dahil) çalışır
+window.onpageshow = function(event) {
+    // Eğer sayfa tarayıcı önbelleğinden (geri tuşuyla) yüklendiyse
+    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        window.location.reload(); // Sayfayı zorla yenile, sunucuya gitmesini sağla
+    }
+};
+
+// Ekstra güvenlik: Session yoksa login'e at
+async function checkAuth() {
+    try {
+        const res = await fetch('/status_check');
+        const data = await res.json();
+        if (data.action === 'banned' || !res.ok) {
+            window.location.replace('/login');
+        }
+    } catch(e) {
+        window.location.replace('/login');
+    }
+}
+checkAuth();
+    
 // Toggle Sidebar for Mobile
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('active');
